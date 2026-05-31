@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Alaska Bar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   ⚙️  НАСТРОЙКИ — МЕНЯЙ ТОЛЬКО ЗДЕСЬ
+══════════════════════════════════════════════════════════════ */
+const CONFIG = {
+
+  /* Ссылки на документы */
+  links: {
+    techCards:   "https://docs.google.com/spreadsheets/d/1aHZNKJvGEY5NoXctkhw9ZuQTrq5vR6iCySoa18D2dyE/edit?usp=drivesdk",  // Тех карты
+    classic:     "https://docs.google.com/spreadsheets/d/1GcFLK13TDk_f4euTXEh3lhDAIcvZKzLLavJ634xbSaA/edit?usp=drivesdk",  // Классика
+    writeOff:    "https://docs.google.com/spreadsheets/d/1heKzaGoMpmKqyAE1UjACCJjNIzZIMHVBcCvN2zZXmAw/edit?usp=drivesdk",  // Бланк списания
+    schedule:    "https://docs.google.com/spreadsheets/d/1_1l7JXCs6HXfRNBVqmkhk2tFFsSz5YMA8y7PwETZnAQ/edit?usp=drivesdk",  // График
+    training:    "https://docs.google.com/ВСТАВЬ_ССЫЛКУ",  // Обучение
+    chats:       "https://t.me/ВСТАВЬ_ССЫЛКУ",             // Чаты
+    calculator:  "https://docs.google.com/ВСТАВЬ_ССЫЛКУ",  // Калькулятор
+    tips:        "https://docs.google.com/spreadsheets/d/11Ywvyx2-SU_CkPHhNS9GsWMQPzFWy2CoEZdBNUc9NVA/edit?usp=drivesdk", // Чаевые
+  },
+
+  /* Chat ID чатов (узнать через @userinfobot) */
+  chats: {
+    orders:    { id: "-5216859508",   thread: null },  // Чат «Заказы продуктов»
+    ice:       { id: "-5237010605",   thread: null },  // Чат «Заказ льда»
+
+    // Темы внутри общего чата — укажи id чата и thread (номер темы)
+    reports:   { id: "-1003983614806", thread: "2" },   // Тема «Отчёты бара»
+    gooddeeds: { id: "-1003983614806", thread: "40" },  // Тема «Добрые дела»
+  },
+
+  /* Имя бота (для формирования ссылок) */
+  botUsername: "alaska_bar_bot",
+  token: "8643480694:AAFphSecjh3ue_Cw2jSHsIZgTe31zJQ9sL0",
+};
+/* ══════════════════════════════════════════════════════════════ */
+</script>
+
+<style>
+:root {
+  --ink:       #080f0a;
+  --ink2:      #0d1a0f;
+  --ink3:      #122016;
+  --ink4:      #1a2e1e;
+  --ink5:      #223828;
+  --em:        #2d7a4a;
+  --em2:       #3da862;
+  --em-dim:    rgba(45,122,74,.18);
+  --em-glow:   rgba(45,122,74,.07);
+  --cream:     #e8f0ea;
+  --muted:     rgba(232,240,234,.45);
+  --muted2:    rgba(232,240,234,.22);
+  --sep:       rgba(45,122,74,.18);
+  --check:     #4cca72;
+  --check-bg:  rgba(76,202,114,.1);
+  --r:        16px; --r-sm:10px;
+  --font-head:'Cormorant Garamond',Georgia,serif;
+  --font-body:'Jost',system-ui,sans-serif;
+  --header-top: 90px;
+  --nav-h:    62px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+html { height:100%; }
+
+body {
+  font-family:var(--font-body);
+  background:var(--ink);
+  color:var(--cream);
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* Grain */
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+
+/* ── HEADER — убран, контент внутри страниц ── */
+.brand{ display:none; }
+.brand-logo{ display:none; }
+
+/* ── SCROLL AREA ── */
+.scroll-area{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ── PAGE ── */
+.page{
+  position:absolute; inset:0;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  display:none;
+}
+.page.active{ display:block; }
+.page::-webkit-scrollbar{ display:none; }
+.page-inner{
+  display:flex; flex-direction:column; gap:12px;
+  padding:var(--header-top) 15px 28px;
+  min-height:100%;
+}
+
+/* ── NAV ── */
+.nav{
+  height:var(--nav-h); flex-shrink:0;
+  background:rgba(8,15,10,.97);
+  border-top:.5px solid var(--sep);
+  display:flex; z-index:10; position:relative;
+}
+.nav-btn{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
+  border:none; background:transparent; cursor:pointer;
+  color:var(--muted2); font-family:var(--font-body);
+  font-size:9.5px; font-weight:500; letter-spacing:.3px; text-transform:uppercase;
+  position:relative; transition:color .2s;
+}
+.nav-btn .ni{ font-size:19px; transition:transform .2s; }
+.nav-btn.active{ color:var(--em2); }
+.nav-btn.active .ni{ transform:translateY(-2px); }
+.nav-btn::after{
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:0; height:2px; background:var(--em);
+  border-radius:0 0 2px 2px; transition:width .25s;
+}
+.nav-btn.active::after{ width:28px; }
+
+/* ── CARDS & COMPONENTS ── */
+.hero{
+  background:linear-gradient(135deg,var(--ink3),var(--ink2));
+  border:.5px solid var(--sep); border-radius:var(--r);
+  padding:18px; position:relative; overflow:hidden;
+}
+.hero::before{
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle,var(--em-glow),transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{ font-size:10px; text-transform:uppercase; letter-spacing:2px; color:var(--em2); margin-bottom:6px; }
+.hero-title{ font-family:var(--font-head); font-size:28px; font-weight:600; line-height:1.1; }
+.hero-sub{ font-size:13px; color:var(--muted); margin-top:6px; line-height:1.5; }
+.hero-line{ width:36px; height:1px; background:linear-gradient(90deg,var(--em),transparent); margin:10px 0; }
+
+.card{
+  background:linear-gradient(135deg,rgba(28,32,48,.9),rgba(19,22,32,.95));
+  border:.5px solid var(--sep); border-radius:var(--r); overflow:hidden;
+}
+.card-head{
+  padding:12px 15px; display:flex; align-items:center; gap:11px;
+  border-bottom:.5px solid var(--sep); background:rgba(201,168,76,.03);
+}
+.card-icon{
+  width:32px; height:32px; border-radius:9px;
+  background:var(--em-dim); border:.5px solid var(--sep);
+  display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+}
+.card-title{ font-family:var(--font-head); font-size:16px; font-weight:600; }
+.card-sub{ font-size:11px; color:var(--muted); margin-top:1px; }
+.card-body{ padding:14px 15px; }
+
+.qlink{
+  display:flex; align-items:center; gap:13px;
+  padding:13px 15px; border-bottom:.5px solid var(--sep);
+  cursor:pointer; transition:background .15s;
+  text-decoration:none; color:var(--cream);
+}
+.qlink:last-child{ border-bottom:none; }
+.qlink:active{ background:var(--em-glow); }
+.qlink-icon{ font-size:19px; width:26px; text-align:center; flex-shrink:0; }
+.qlink-body{ flex:1; }
+.qlink-title{ font-size:14px; font-weight:500; }
+.qlink-sub{ font-size:11px; color:var(--muted); margin-top:1px; }
+.qlink-arr{ color:var(--muted2); font-size:16px; }
+
+.task{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 15px; border-bottom:.5px solid var(--sep);
+  cursor:pointer; transition:background .15s; user-select:none;
+}
+.task:last-child{ border-bottom:none; }
+.task:active{ background:var(--em-glow); }
+.task.done .task-text{ text-decoration:line-through; color:var(--muted); }
+.task-cb{
+  width:22px; height:22px; border-radius:6px; flex-shrink:0; margin-top:2px;
+  border:1.5px solid rgba(45,122,74,.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:transparent;
+  transition:all .2s; background:transparent;
+}
+.task.done .task-cb{
+  background:var(--em); border-color:var(--em);
+  color:var(--ink); box-shadow:0 0 10px rgba(45,122,74,.3);
+}
+.task-inner{ flex:1; min-width:0; }
+.task-num{ font-size:10px; color:var(--em2); letter-spacing:.8px; margin-bottom:3px; font-weight:500; }
+.task-text{ font-size:13.5px; line-height:1.6; }
+
+.prog{
+  background:var(--ink3); border:.5px solid var(--sep); border-radius:var(--r);
+  padding:12px 15px;
+}
+.prog-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+.prog-lbl{ font-size:12px; color:var(--muted); font-weight:500; }
+.prog-val{ font-family:var(--font-head); font-size:18px; font-weight:600; color:var(--em); }
+.prog-track{ height:4px; background:var(--ink4); border-radius:2px; overflow:hidden; }
+.prog-fill{ height:100%; background:linear-gradient(90deg,var(--em),var(--em2)); border-radius:2px; transition:width .4s cubic-bezier(.4,0,.2,1); }
+
+.seg{ display:flex; background:var(--ink3); border:.5px solid var(--sep); border-radius:12px; padding:3px; gap:3px; }
+.seg-btn{
+  flex:1; padding:10px; border:none; border-radius:9px;
+  font-family:var(--font-body); font-size:13px; font-weight:500;
+  cursor:pointer; background:transparent; color:var(--muted); transition:all .22s;
+}
+.seg-btn.active{
+  background:linear-gradient(135deg,var(--ink4),var(--ink3));
+  color:var(--em); border:.5px solid var(--sep);
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+.form-label{
+  font-size:10px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--muted); margin-bottom:6px; display:block; font-weight:500;
+}
+.form-ctrl{
+  width:100%; background:var(--ink3); border:.5px solid var(--sep);
+  border-radius:var(--r-sm); padding:11px 13px;
+  color:var(--cream); font-family:var(--font-body); font-size:14px;
+  outline:none; -webkit-appearance:none; transition:border-color .2s;
+  display:block;
+}
+.form-ctrl:focus{ border-color:var(--em); }
+.form-ctrl::placeholder{ color:var(--muted2); }
+textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
+.form-group{ margin-bottom:13px; }
+
+.photo-drop{
+  background:var(--ink3); border:1px dashed rgba(201,168,76,.2);
+  border-radius:var(--r-sm); padding:20px; text-align:center; cursor:pointer;
+  transition:border-color .2s;
+}
+.photo-drop:active{ border-color:var(--em); }
+.photo-drop-ico{ font-size:26px; margin-bottom:6px; }
+.photo-drop-txt{ font-size:12.5px; color:var(--muted); line-height:1.5; }
+.photo-drop-txt b{ color:var(--cream); }
+
+.btn{
+  width:100%; padding:14px; border-radius:var(--r-sm);
+  border:none; font-family:var(--font-body); font-size:13.5px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
+  letter-spacing:.6px; text-transform:uppercase; transition:all .18s;
+}
+.btn:active{ transform:scale(.98); }
+.btn-gold{ background:linear-gradient(135deg,var(--em),var(--em2)); color:var(--ink); box-shadow:0 4px 18px rgba(45,122,74,.35); }
+.btn-ok{ background:rgba(76,175,130,.12); color:#4caf82; border:.5px solid rgba(76,175,130,.2); }
+
+.banner{
+  border-radius:var(--r-sm); padding:11px 13px;
+  font-size:12.5px; line-height:1.6;
+  display:flex; gap:9px; align-items:flex-start;
+}
+.banner-gold{ background:var(--em-dim); border:.5px solid var(--sep); color:var(--cream); }
+.banner-green{ background:rgba(76,175,130,.1); border:.5px solid rgba(76,175,130,.2); color:#4caf82; }
+.banner-ico{ flex-shrink:0; font-size:15px; margin-top:1px; }
+
+.day-tabs{
+  display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding:2px 0;
+}
+.day-tabs::-webkit-scrollbar{ display:none; }
+.dt{
+  flex-shrink:0; padding:7px 13px; border-radius:20px;
+  font-size:11.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
+  cursor:pointer; border:none; background:var(--ink3); color:var(--muted2); transition:all .2s;
+}
+.dt.active{ background:var(--em); color:#fff; }
+.dt.today:not(.active){ border:.5px solid rgba(45,122,74,.4); color:var(--em); }
+
+.day-head{
+  background:linear-gradient(135deg,var(--ink3),var(--ink2));
+  border:.5px solid var(--sep); border-radius:var(--r);
+  padding:15px 17px; display:flex; align-items:center; gap:13px;
+}
+.day-emoji{ font-size:36px; }
+.day-name{ font-family:var(--font-head); font-size:22px; font-weight:600; }
+.day-badge{ font-size:11px; color:var(--em2); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+.sec-label{
+  font-size:9.5px; text-transform:uppercase; letter-spacing:2px;
+  color:var(--em2); font-weight:600; padding:0 2px;
+}
+
+.success{
+  background:rgba(76,175,130,.08); border:.5px solid rgba(76,175,130,.2);
+  border-radius:var(--r); padding:22px; text-align:center; display:none;
+}
+.success.show{ display:block; }
+.success-ico{ font-size:38px; margin-bottom:8px; }
+.success-title{ font-family:var(--font-head); font-size:21px; font-weight:600; color:#4caf82; }
+.success-sub{ font-size:12px; color:var(--muted); margin-top:3px; }
+</style>
+</head>
+<body>
+
+<!-- header removed - content inside pages -->
+
+<!-- SCROLL AREA -->
+<div class="scroll-area">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+<div class="page-inner">
+    <div class="hero">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0d2415,#071209);border:.5px solid var(--em-dim);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍸</div>
+        <div>
+          <div style="font-family:var(--font-head);font-size:20px;font-weight:600">Alaska Bar</div>
+          <div style="font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase">Bar Management</div>
+        </div>
+        <div style="margin-left:auto;font-size:12px;color:var(--em2);font-weight:500;background:var(--em-dim);border:.5px solid var(--sep);border-radius:20px;padding:5px 12px" id="hDate">—</div>
+      </div>
+      <div class="hero-eyebrow">Добро пожаловать</div>
+      <div class="hero-title">Всё необходимое<br>в одном месте</div>
+      <div class="hero-line"></div>
+      <div class="hero-sub" id="homeDate">—</div>
+    </div>
+    <div class="sec-label">Разделы</div>
+    <div class="card">
+      <div class="qlink" onclick="goTo('checklist')">
+        <span class="qlink-icon">✅</span>
+        <div class="qlink-body"><div class="qlink-title">Чек-лист</div><div class="qlink-sub">Открытие · Закрытие</div></div>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="goTo('order')">
+        <span class="qlink-icon">📦</span>
+        <div class="qlink-body"><div class="qlink-title">Заказы</div><div class="qlink-sub">Продукты · Лёд</div></div>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="goTo('report')">
+        <span class="qlink-icon">📝</span>
+        <div class="qlink-body"><div class="qlink-title">Отчёт по смене</div><div class="qlink-sub">Текст · Фото</div></div>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="goTo('gooddeeds')">
+        <span class="qlink-icon">📅</span>
+        <div class="qlink-body"><div class="qlink-title">Добрые дела</div><div class="qlink-sub">Задача дня</div></div>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="goTo('docs')">
+        <span class="qlink-icon">📚</span>
+        <div class="qlink-body"><div class="qlink-title">Документы</div><div class="qlink-sub">Тех карты · Бланки · График</div></div>
+        <span class="qlink-arr">›</span>
+      </div>
+    </div>
+    <div class="banner banner-gold">
+      <span class="banner-ico">📅</span>
+      <span>Сегодня <b id="todayName">—</b> — задача «Добрых дел» уже ждёт.</span>
+    </div>
+</div>
+</div>
+
+  <!-- CHECKLIST -->
+  <div class="page" id="page-checklist">
+<div class="page-inner">
+    <div class="seg">
+      <button class="seg-btn active" id="so" onclick="clSwitch('open')">🌞 Открытие</button>
+      <button class="seg-btn"        id="sc" onclick="clSwitch('close')">🌙 Закрытие</button>
+    </div>
+    <div id="cl-prog"></div>
+    <div class="sec-label" id="cl-lbl">Задачи открытия</div>
+    <div class="card" id="cl-list"></div>
+    <div class="banner banner-green" id="cl-ok" style="display:none">
+      <span class="banner-ico">🎉</span>
+      <span>Все пункты выполнены! Поставь реакцию на сообщение бота.</span>
+    </div>
+  </div>
+</div>
+
+  <!-- ORDERS -->
+  <div class="page" id="page-order">
+<div class="page-inner">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon">📦</div>
+        <div><div class="card-title">Заказ продуктов</div><div class="card-sub">Отправится в чат «Заказы»</div></div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Список — каждый продукт с новой строки</label>
+          <textarea class="form-ctrl" id="txP" style="min-height:140px" placeholder="Лимоны — 5 кг&#10;Клубника — 500 гр&#10;Персик — 2 кг&#10;Мята — 100 гр&#10;Морковь — 10 кг"></textarea>
+        </div>
+        <button class="btn btn-gold" id="btnP" onclick="sendOrder('products')">Отправить заказ продуктов</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon">🧊</div>
+        <div><div class="card-title">Заказ льда</div><div class="card-sub">Отправится в чат «Лёд»</div></div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Тип и количество льда</label>
+          <textarea class="form-ctrl" id="txI" style="min-height:160px" placeholder="Куб — 53х53х53 — «вес»&#10;Стик — 45х40х110 — «вес»&#10;Стик #2 — 35х35х125 — «вес»&#10;Глыба — 40х40х70 — «вес»&#10;Кусок — «вес»&#10;Краш — «вес»"></textarea>
+        </div>
+        <button class="btn btn-gold" id="btnI" onclick="sendOrder('ice')">Отправить заказ льда</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- REPORT -->
+  <div class="page" id="page-report">
+<div class="page-inner">
+    <div class="banner banner-gold">
+      <span class="banner-ico">📝</span>
+      <span>Отчёт отправится в чат «Отчёты бара».</span>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon">📝</div>
+        <div><div class="card-title">Отчёт по смене</div><div class="card-sub">Открытие · Закрытие</div></div>
+      </div>
+      <div class="card-body">
+
+        <div class="form-group">
+          <label class="form-label">Тип смены</label>
+          <select class="form-ctrl" id="repTag" onchange="onRepTagChange()">
+            <option value="#открытиеАляска">#открытиеАляска</option>
+            <option value="#закрытиеАляска">#закрытиеАляска</option>
+          </select>
+        </div>
+
+        <!-- Рецепт кофе — только для открытия (обязательное поле) -->
+        <div class="form-group" id="coffeeBlock">
+          <label class="form-label">☕️ Рецепт кофе (настройка помола) <span style="color:var(--check);font-size:10px">*обязательно</span></label>
+          <textarea class="form-ctrl" id="coffeeRecipe" style="min-height:90px" placeholder="Дата обжарки, масса помола, пролив в сек., выход эспрессо в гр..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Текст отчёта <span id="textRequired" style="color:var(--muted);font-size:10px">(необязательно)</span></label>
+          <textarea class="form-ctrl" id="repTxt" style="min-height:90px" placeholder="Если хочешь что-то добавить..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Фото <span id="photoRequired" style="color:var(--muted);font-size:10px">(необязательно)</span></label>
+          <div class="photo-drop" onclick="document.getElementById('repPhoto').click()">
+            <div class="photo-drop-ico">📸</div>
+            <div class="photo-drop-txt"><b id="photoLbl">Нажми чтобы прикрепить фото</b><br>Можно несколько</div>
+          </div>
+          <input type="file" id="repPhoto" accept="image/*" multiple style="display:none" onchange="onPhoto()">
+        </div>
+
+        <!-- Фото списания из iiko — только для закрытия -->
+        <div id="writeOffBlock" style="display:none">
+          <div style="height:.5px;background:var(--sep);margin:4px 0 14px"></div>
+          <div class="form-group">
+            <label class="form-label">🧾 Фото списания из iiko <span style="color:var(--check);font-size:10px">*обязательно</span></label>
+            <div class="photo-drop" onclick="document.getElementById('writeOffPhoto').click()">
+              <div class="photo-drop-ico">🧾</div>
+              <div class="photo-drop-txt"><b id="writeOffPhotoLbl">Прикрепи скрин из iiko</b><br>Можно несколько</div>
+            </div>
+            <input type="file" id="writeOffPhoto" accept="image/*" multiple style="display:none" onchange="onWriteOffPhoto()">
+          </div>
+        </div>
+
+        <button class="btn btn-gold" id="btnR" onclick="sendReport()">Отправить отчёт</button>
+      </div>
+    </div>
+    <div class="success" id="repOk">
+      <div class="success-ico">✅</div>
+      <div class="success-title">Отчёт отправлен</div>
+      <div class="success-sub">Менеджер получил отчёт и фото</div>
+    </div>
+  </div>
+</div>
+
+  <!-- GOOD DEEDS -->
+  <div class="page" id="page-gooddeeds">
+<div class="page-inner">
+    <div class="day-tabs" id="gdTabs"></div>
+    <div id="gdBody"></div>
+  </div>
+</div>
+
+  <!-- DOCS -->
+  <div class="page" id="page-docs">
+<div class="page-inner">
+    <div class="hero" style="padding:15px 17px">
+      <div class="hero-eyebrow">Библиотека</div>
+      <div class="hero-title" style="font-size:24px">Документы</div>
+      <div class="hero-sub" style="margin-top:4px">Все рабочие материалы Alaska</div>
+    </div>
+    <div class="sec-label">Бар</div>
+    <div class="card" id="docs-bar"></div>
+    <div class="sec-label">Команда</div>
+    <div class="card" id="docs-team"></div>
+  </div>
+</div>
+
+</div><!-- /scroll-area -->
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="goTo('home')">     <span class="ni">🏠</span>Главная</button>
+  <button class="nav-btn"        onclick="goTo('checklist')"><span class="ni">✅</span>Чек-лист</button>
+  <button class="nav-btn"        onclick="goTo('order')">    <span class="ni">📦</span>Заказы</button>
+  <button class="nav-btn"        onclick="goTo('report')">   <span class="ni">📝</span>Отчёт</button>
+  <button class="nav-btn"        onclick="goTo('gooddeeds')"><span class="ni">📅</span>Добрые дела</button>
+  <button class="nav-btn"        onclick="goTo('docs')">     <span class="ni">📚</span>Документы</button>
+</nav>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════════════════ */
+const CL_OPEN = [
+  "Включить кофейное оборудование: кофемолку, кофемашину.",
+  "Взять чистые тряпки для поверхностей станции / кофемашины / холдеров. Протереть барную стойку.",
+  "Достать бутылки с коктейлями и украшения из холодильников. Расставить в станцию. Проверить коктейли на газацию, залить недостающее. Проставить ежедневные маркировки.",
+  "Засыпать лёд фраппе и кусок.",
+  "Настроить помол зерна (отправить рецепт в bar team: дата обжарки / масса помола / пролив в сек. / выход эспрессо в гр.)",
+  "Слить фильтр-воду и залить в графины. Нарезать цитрусы. Проверить зону раздачи на расходники, посуду и гарниши.",
+  "Заполнить бланк списания (помол зерна, порча и т.д.)",
+  "Заполнить стоп-лист по бару и отправить в чат Alaska Team.",
+  "Подготовить бар к вечернему сервису: актуализировать стоп-лист, проверить коктейли, запастись льдом, затарить софт.",
+];
+const CL_CLOSE = [
+  "Принять смену у утреннего бармена на готовность к вечернему сервису.",
+  "Слить воду с графинов, натереть насухо, убрать разводы.",
+  "Написать заказ продуктов и льда в бар до 22:00.",
+  "Замыть кофемашину: промыть группы, форсунки, поддон, приборную панель, холдеры. Выключить.",
+  "Протереть бутылки с премиксами и убрать в холодильник. Пустые заполнить сразу.",
+  "Замыть чайную зону, кофейную зону, зону раздачи, выключить бойлер. Разобрать Ларго, вытереть. Выставить оборудование для завтраков.",
+  "Замыть обе станции, раковину, все поверхности бара. Замыть низы холодильников, всё насухо.",
+  "Заполнить бланк списания, отправить скрин в документооборот / BarTeam.",
+  "Позвать грузчика вынести мусор. Проверить мусорный отсек.",
+  "Поставить в стоп-лист всё, что закончилось вечером.",
+  "Посчитать чай, внести в бланк. Убрать в выделенную тару.",
+  "Написать отчёт по смене с фотоотчётом всех замытых зон.",
+  "Сдать использованные тряпки на мойку (прачечную).",
+];
+const GD = [
+  { name:"Воскресенье", short:"Вс", emoji:"☀️",
+    bar:["Привести в порядок холодильники с премиксами.","Замыть вторую станцию."], prep:[] },
+  { name:"Понедельник", short:"Пн", emoji:"🌱",
+    bar:["Протереть полку с кофе под кофемашиной, кофемолкой и бойлером.","Протереть холодильник с молоком.","Замыть чайную зону.","Замыть стену у фреш зоны."], prep:[] },
+  { name:"Вторник", short:"Вт", emoji:"🧹",
+    bar:["Протереть выкладку и витрину.","Протереть бутылки от пыли."],
+    prep:["Протереть холодильный стол на заготовке внутри и снаружи (резинки, дверцы, нижние части дверей).","Протереть стену перед холодильным шкафом."] },
+  { name:"Среда", short:"Ср", emoji:"🧊",
+    bar:["Разморозить морозилку с посудой и льдом.","Выдвинуть холодильники и привести за ними порядок."],
+    prep:["Протереть стеллаж с сухофруктами и сыпучей продукцией.","Протереть полку под плитой.","Замыть всю зону су-вид и полку снизу."] },
+  { name:"Четверг", short:"Чт", emoji:"🗑️",
+    bar:["Протереть полки с софтами.","Уборка за мусоркой и помыть стены."],
+    prep:["Протереть стеллажи для ферментации.","Замыть зону вокруг вакууматора.","Почистить вакууматор."] },
+  { name:"Пятница", short:"Пт", emoji:"🏷️",
+    bar:["Перемаркировка хересов, портвейнов.","Обновить маркировку на гарнирах.","Проверить сроки годности ПФ продукта.","Проверить штучный товар на срок годности."],
+    prep:["Навести порядок в плюсовой камере и холодильниках у заготовки.","Замыть все раковины с моющим средством в конце дня."] },
+  { name:"Суббота", short:"Сб", emoji:"🧽",
+    bar:["Протереть стеллаж с сыпучками, фруктами и оборудованием.","Замыть под драфт системой."],
+    prep:["Навести порядок в плюсовом холодильнике на заготовке.","Отмыть все стены до уровня полок вдоль рабочих поверхностей и перед раковинами."] },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+const today = new Date().getDay();
+let clMode = 'open';
+let clDone = { open:{}, close:{} };
+let gdDay    = today;
+let gdDone   = {};
+let gdPhotos = {};   // хранит FileList по дням
+let gdSent   = {};   // флаг отправки по дням
+let gdNotes  = {};   // доп. заметки по дням
+
+/* ══════════════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════════════ */
+const PAGES = ['home','checklist','order','report','gooddeeds','docs'];
+
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn')[PAGES.indexOf(id)].classList.add('active');
+  if (id==='checklist') renderCL();
+  if (id==='gooddeeds') renderGD();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════════════════════ */
+function initHome() {
+  const d = new Date();
+  document.getElementById('hDate').textContent = d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+  const ds = d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('homeDate').textContent = ds.charAt(0).toUpperCase()+ds.slice(1);
+  document.getElementById('todayName').textContent = GD[today].name;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHECKLIST
+══════════════════════════════════════════════════════════════ */
+function clSwitch(m) {
+  clMode = m;
+  document.getElementById('so').classList.toggle('active', m==='open');
+  document.getElementById('sc').classList.toggle('active', m==='close');
+  renderCL();
+}
+
+function renderCL() {
+  const list = clMode==='open' ? CL_OPEN : CL_CLOSE;
+  const done = Object.values(clDone[clMode]).filter(Boolean).length;
+  const total = list.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  document.getElementById('cl-lbl').textContent = clMode==='open' ? 'Задачи открытия' : 'Задачи закрытия';
+
+  document.getElementById('cl-prog').innerHTML = `
+    <div class="prog">
+      <div class="prog-row">
+        <span class="prog-lbl">Выполнено</span>
+        <span class="prog-val">${done} / ${total}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  let html = '';
+  list.forEach((t,i) => {
+    const ok = !!clDone[clMode][i];
+    html += `<div class="task${ok?' done':''}" onclick="toggleCL(${i})">
+      <div class="task-cb">${ok?'✓':''}</div>
+      <div class="task-inner">
+        <div class="task-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="task-text">${t}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('cl-list').innerHTML = html;
+
+  document.getElementById('cl-ok').style.display =
+    (done===total && total>0) ? 'flex' : 'none';
+}
+
+function toggleCL(i) {
+  clDone[clMode][i] = !clDone[clMode][i];
+  haptic(); renderCL();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ORDERS  —  отправка через Telegram WebApp
+   PuzzleBot Flow получает JSON и пересылает в нужный чат
+══════════════════════════════════════════════════════════════ */
+async function sendOrder(type) {
+  const isP = type==='products';
+  const val = document.getElementById(isP?'txP':'txI').value.trim();
+  if (!val) { alert(isP ? 'Напиши список продуктов!' : 'Укажи тип и количество льда!'); return; }
+
+  const d = new Date();
+  const dt = d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+
+  // Данные которые получит PuzzleBot
+  const chat = isP ? CONFIG.chats.orders : CONFIG.chats.ice;
+  const text = `Заказ на бар\nОт: ${getUserName()}\nДата: ${dt}\n\n${val}`;
+  await sendToTelegram(chat.id, chat.thread, text);
+
+  const btn = document.getElementById(isP?'btnP':'btnI');
+  btn.className = 'btn btn-ok';
+  btn.textContent = '✅ Отправлено!';
+  document.getElementById(isP?'txP':'txI').value = '';
+  setTimeout(()=>{
+    btn.className = 'btn btn-gold';
+    btn.textContent = isP ? 'Отправить заказ продуктов' : 'Отправить заказ льда';
+  }, 3000);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REPORT
+══════════════════════════════════════════════════════════════ */
+function onPhoto() {
+  const f = document.getElementById('repPhoto').files;
+  document.getElementById('photoLbl').textContent =
+    f.length ? `📎 Прикреплено: ${f.length} фото` : 'Нажми чтобы прикрепить фото';
+}
+
+function onWriteOffPhoto() {
+  const f = document.getElementById('writeOffPhoto').files;
+  document.getElementById('writeOffPhotoLbl').textContent =
+    f.length ? `📎 Прикреплено: ${f.length} фото` : 'Нажми чтобы прикрепить фото';
+}
+
+function onRepTagChange() {
+  try {
+    const tag = document.getElementById('repTag').value;
+    const isClose = tag.includes('закрытие');
+    const writeOff = document.getElementById('writeOffBlock');
+    const coffee   = document.getElementById('coffeeBlock');
+    if (writeOff) writeOff.style.display = isClose ? 'block' : 'none';
+    if (coffee)   coffee.style.display   = isClose ? 'none'  : 'block';
+    const tr = document.getElementById('textRequired');
+    const pr = document.getElementById('photoRequired');
+    if (tr) tr.textContent = isClose ? '*обязательно' : '(необязательно)';
+    if (pr) pr.textContent = isClose ? '*обязательно' : '(необязательно)';
+    if (tr) tr.style.color = isClose ? 'var(--check)' : 'var(--muted)';
+    if (pr) pr.style.color = isClose ? 'var(--check)' : 'var(--muted)';
+  } catch(e) { console.error('onRepTagChange:', e); }
+}
+
+async function sendReport() {
+  try {
+    const tag     = document.getElementById('repTag').value;
+    const isClose = tag.includes('закрытие');
+    const text    = (document.getElementById('repTxt')?.value || '').trim();
+    const coffee  = (document.getElementById('coffeeRecipe')?.value || '').trim();
+    const photoFiles    = document.getElementById('repPhoto')?.files || [];
+    const writeOffPhoto = document.getElementById('writeOffPhoto')?.files || [];
+
+    // Валидация
+    if (isClose) {
+      if (!text) { alert('Напиши текст отчёта закрытия!'); return; }
+      if (photoFiles.length === 0) { alert('Прикрепи фото замытых зон!'); return; }
+      if (writeOffPhoto.length === 0) { alert('Прикрепи фото списания из iiko!'); return; }
+    } else {
+      if (!coffee) { alert('Заполни рецепт кофе — это обязательное поле!'); return; }
+    }
+
+    const d  = new Date();
+    const dt = d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+    const chat = CONFIG.chats.reports;
+
+    // Собираем подпись
+    let parts = [tag, 'От: ' + getUserName(), 'Дата: ' + dt];
+    if (!isClose && coffee) parts.push('\n☕️ Рецепт кофе:\n' + coffee);
+    if (text) parts.push('\n' + text);
+    const caption = parts.join('\n');
+
+    // Отправка основного отчёта
+    let ok;
+    if (photoFiles.length > 0) {
+      ok = await sendPhotosToTelegram(chat.id, chat.thread, photoFiles, caption);
+    } else {
+      ok = await sendToTelegram(chat.id, chat.thread, caption);
+    }
+    if (!ok) return;
+
+    // Фото списания из iiko — отдельным сообщением
+    if (isClose && writeOffPhoto.length > 0) {
+      const woCaption = '🧾 Списание из iiko\nОт: ' + getUserName() + '\n' + dt;
+      await sendPhotosToTelegram(chat.id, chat.thread, writeOffPhoto, woCaption);
+    }
+
+    document.getElementById('btnR').className = 'btn btn-ok';
+    document.getElementById('btnR').textContent = '✅ Отчёт отправлен!';
+    document.getElementById('repOk').classList.add('show');
+    document.getElementById('repTxt').value = '';
+    if (document.getElementById('coffeeRecipe')) document.getElementById('coffeeRecipe').value = '';
+  } catch(e) {
+    console.error('sendReport error:', e);
+    alert('Ошибка: ' + e.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GOOD DEEDS
+══════════════════════════════════════════════════════════════ */
+function renderGD() {
+  let tabs = '';
+  GD.forEach((d,i) => {
+    tabs += `<button class="dt${i===gdDay?' active':''}${i===today&&i!==gdDay?' today':''}" onclick="switchGD(${i})">${d.short}</button>`;
+  });
+  document.getElementById('gdTabs').innerHTML = tabs;
+  setTimeout(()=>{
+    const el = document.querySelector('.dt.active');
+    if (el) el.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  }, 50);
+
+  const d = GD[gdDay];
+  const keys = [...d.bar.map((_,i)=>`b${i}`), ...d.prep.map((_,i)=>`p${i}`)];
+  const done = keys.filter(k => gdDone[`${gdDay}_${k}`]).length;
+  const total = keys.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  let html = `
+    <div class="day-head">
+      <div class="day-emoji">${d.emoji}</div>
+      <div>
+        <div class="day-name">${d.name}</div>
+        <div class="day-badge">📅 Добрые дела${gdDay===today?' · Сегодня':''}</div>
+      </div>
+    </div>
+    <div class="prog">
+      <div class="prog-row"><span class="prog-lbl">Выполнено</span><span class="prog-val">${done} / ${total}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  if (d.bar.length) {
+    html += `<div class="sec-label">Бар</div><div class="card">`;
+    d.bar.forEach((t,i) => {
+      const ok = !!gdDone[`${gdDay}_b${i}`];
+      html += `<div class="task${ok?' done':''}" onclick="toggleGD('b',${i})">
+        <div class="task-cb">${ok?'✓':''}</div>
+        <div class="task-inner">
+          <div class="task-num">0${i+1}</div>
+          <div class="task-text">${t}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  if (d.prep.length) {
+    html += `<div class="sec-label">Заготовка</div><div class="card">`;
+    d.prep.forEach((t,i) => {
+      const ok = !!gdDone[`${gdDay}_p${i}`];
+      html += `<div class="task${ok?' done':''}" onclick="toggleGD('p',${i})">
+        <div class="task-cb">${ok?'✓':''}</div>
+        <div class="task-inner">
+          <div class="task-num">0${i+1}</div>
+          <div class="task-text">${t}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (done===total && total>0)
+    html += `<div class="banner banner-green"><span class="banner-ico">🎉</span><span>Все задачи выполнены! Теперь прикрепи фото и отправь отчёт.</span></div>`;
+
+  // Блок фото + заметка + кнопка отправки
+  const photoCount = gdPhotos[gdDay] ? gdPhotos[gdDay].length : 0;
+  const photoLbl = photoCount > 0 ? `📎 Прикреплено: ${photoCount} фото` : 'Нажми чтобы прикрепить фото';
+  const sent = !!gdSent[gdDay];
+  const savedNote = gdNotes[gdDay] || '';
+
+  html += `
+    <div class="sec-label">Фотоотчёт</div>
+    <div class="card">
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Дополнительно — что ещё замыли или сделали (необязательно)</label>
+          <textarea class="form-ctrl" id="gdNote" placeholder="Например: замыли витрину, протёрли барную стойку..." style="min-height:70px" oninput="gdNotes[${gdDay}]=this.value">${savedNote}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Фото выполненной работы</label>
+          <div class="photo-drop" onclick="document.getElementById('gdPhoto').click()">
+            <div class="photo-drop-ico">📸</div>
+            <div class="photo-drop-txt"><b id="gdPhotoLbl">${photoLbl}</b><br>Можно несколько</div>
+          </div>
+          <input type="file" id="gdPhoto" accept="image/*" multiple style="display:none" onchange="onGdPhoto()">
+        </div>
+        <button class="btn ${sent ? 'btn-ok' : 'btn-gold'}" id="btnGd" onclick="sendGdReport()" ${sent ? 'disabled' : ''}>
+          ${sent ? '✅ Фотоотчёт отправлен!' : '📤 Отправить фотоотчёт'}
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById('gdBody').innerHTML = html;
+}
+
+function switchGD(i) { gdDay = i; renderGD(); }
+function toggleGD(s, i) { const k=`${gdDay}_${s}${i}`; gdDone[k]=!gdDone[k]; haptic(); renderGD(); }
+
+function onGdPhoto() {
+  const files = document.getElementById('gdPhoto').files;
+  if (files.length) {
+    gdPhotos[gdDay] = files;
+    const lbl = document.getElementById('gdPhotoLbl');
+    if (lbl) lbl.textContent = `📎 Прикреплено: ${files.length} фото`;
+    haptic();
+  }
+}
+
+async function sendGdReport() {
+  const d = GD[gdDay];
+  const photos = gdPhotos[gdDay];
+  const noteVal = (document.getElementById('gdNote')?.value || '').trim();
+
+  if ((!photos || photos.length === 0) && !noteVal) {
+    alert('Прикрепи фото или напиши что было сделано дополнительно!'); return;
+  }
+
+  const dt = new Date().toLocaleDateString('ru-RU') + ' ' +
+             new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+
+  const chat = CONFIG.chats.gooddeeds;
+
+  // Собираем выполненные задачи
+  const doneTasks = [];
+  d.bar.forEach((t, i) => { if (gdDone[`${gdDay}_b${i}`]) doneTasks.push('✅ ' + t); });
+  d.prep.forEach((t, i) => { if (gdDone[`${gdDay}_p${i}`]) doneTasks.push('✅ ' + t); });
+
+  let caption = `📅 Добрые дела · ${d.name}\nОт: ${getUserName()}\nДата: ${dt}`;
+  if (doneTasks.length > 0) caption += `\n\nВыполнено:\n` + doneTasks.join('\n');
+  if (noteVal) caption += `\n\nДополнительно: ${noteVal}`;
+
+  let ok = false;
+  if (photos && photos.length > 0) {
+    ok = await sendPhotosToTelegram(chat.id, chat.thread, photos, caption);
+  } else {
+    ok = await sendToTelegram(chat.id, chat.thread, caption);
+  }
+
+  if (!ok) return;
+
+  gdSent[gdDay] = true;
+  haptic();
+  renderGD();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DOCS — строим из CONFIG
+══════════════════════════════════════════════════════════════ */
+function buildDocs() {
+  const bar = [
+    { ico:'📖', title:'Тех карты',      sub:'Рецепты и технологические карты', href: CONFIG.links.techCards },
+    { ico:'🍸', title:'Классика',       sub:'Классические коктейли',            href: CONFIG.links.classic },
+    { ico:'✏️', title:'Бланк списания', sub:'Форма для списания продуктов',    href: CONFIG.links.writeOff },
+    { ico:'💰', title:'Чаевые',         sub:'Таблица учёта чаевых',             href: CONFIG.links.tips },
+  ];
+  const team = [
+    { ico:'📊', title:'График',    sub:'Расписание смен',          href: CONFIG.links.schedule },
+    { ico:'📋', title:'Обучение',  sub:'Материалы для обучения',    href: CONFIG.links.training },
+    { ico:'💬', title:'Чаты',      sub:'Все рабочие чаты команды',  href: CONFIG.links.chats },
+  ];
+  const row = ({ico,title,sub,href}) =>
+    `<a class="qlink" href="${href}" target="_blank">
+       <span class="qlink-icon">${ico}</span>
+       <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
+       <span class="qlink-arr">↗</span>
+     </a>`;
+  document.getElementById('docs-bar').innerHTML  = bar.map(row).join('');
+  document.getElementById('docs-team').innerHTML = team.map(row).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TELEGRAM API — прямая отправка в чаты
+══════════════════════════════════════════════════════════════ */
+// Отправить текстовое сообщение
+async function sendToTelegram(chatId, threadId, text) {
+  const url = `https://api.telegram.org/bot${CONFIG.token}/sendMessage`;
+  const body = { chat_id: chatId, text: text, parse_mode: 'HTML' };
+  if (threadId) body.message_thread_id = parseInt(threadId);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error('Telegram API error:', data);
+      alert('Ошибка отправки: ' + (data.description || 'неизвестная ошибка'));
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Network error:', e);
+    alert('Ошибка сети. Проверь подключение.');
+    return false;
+  }
+}
+
+// Отправить фото — одно или альбомом (стопкой)
+async function sendPhotosToTelegram(chatId, threadId, files, caption) {
+  if (!files || files.length === 0) return false;
+
+  // Одно фото — sendPhoto
+  if (files.length === 1) {
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append('photo', files[0]);
+    if (caption) form.append('caption', caption);
+    if (threadId) form.append('message_thread_id', parseInt(threadId));
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendPhoto`, { method:'POST', body:form });
+      const data = await res.json();
+      return data.ok;
+    } catch(e) { return false; }
+  }
+
+  // Несколько фото — sendMediaGroup (альбом, стопкой)
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  if (threadId) form.append('message_thread_id', parseInt(threadId));
+
+  const media = [];
+  const maxPhotos = Math.min(files.length, 10); // Telegram ограничение — до 10 в альбоме
+  for (let i = 0; i < maxPhotos; i++) {
+    const key = `photo${i}`;
+    form.append(key, files[i]);
+    media.push({
+      type: 'photo',
+      media: `attach://${key}`,
+      caption: i === 0 ? caption : '',  // подпись только к первому
+    });
+  }
+  form.append('media', JSON.stringify(media));
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendMediaGroup`, { method:'POST', body:form });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error('sendMediaGroup error:', data);
+      return false;
+    }
+    // Если фото больше 10 — отправляем остаток по одному
+    if (files.length > 10) {
+      for (let i = 10; i < files.length; i++) {
+        const f2 = new FormData();
+        f2.append('chat_id', chatId);
+        f2.append('photo', files[i]);
+        if (threadId) f2.append('message_thread_id', parseInt(threadId));
+        await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendPhoto`, { method:'POST', body:f2 });
+      }
+    }
+    return true;
+  } catch(e) {
+    console.error('Album send error:', e);
+    return false;
+  }
+}
+
+function getUserName() {
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    const u = Telegram.WebApp.initDataUnsafe.user;
+    return u.username ? '@' + u.username : (u.first_name || 'Бармен');
+  }
+  return 'Бармен';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════════ */
+function haptic() {
+  if (window.Telegram?.WebApp?.HapticFeedback)
+    Telegram.WebApp.HapticFeedback.impactOccurred('light');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TEST
+══════════════════════════════════════════════════════════════ */
+async function testGoodDeeds() {
+  const chat = CONFIG.chats.gooddeeds;
+  const msg = `🔧 Тест · Добрые дела\nChat ID: ${chat.id}\nThread ID: ${chat.thread}`;
+
+  alert(`Отправляю тест:\nChat ID: ${chat.id}\nThread ID: ${chat.thread}\nToken: ...${CONFIG.token.slice(-6)}`);
+
+  const url = `https://api.telegram.org/bot${CONFIG.token}/sendMessage`;
+  const body = { chat_id: chat.id, text: msg };
+  if (chat.thread) body.message_thread_id = parseInt(chat.thread);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      alert('✅ Тест отправлен успешно! Проверь топик.');
+    } else {
+      alert('❌ Ошибка: ' + JSON.stringify(data));
+    }
+  } catch(e) {
+    alert('❌ Сетевая ошибка: ' + e.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+if (window.Telegram?.WebApp) {
+  const tg = Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+
+  // отступ фиксированный — задаётся в CSS переменной --header-top
+}
+initHome();
+renderCL();
+renderGD();
+buildDocs();
+if (typeof onRepTagChange === "function") onRepTagChange();
+</script>
+</body>
+</html>
