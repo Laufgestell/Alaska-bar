@@ -33,6 +33,7 @@ const CONFIG = {
     // Темы внутри общего чата — укажи id чата и thread (номер темы)
     reports:   { id: "-1003983614806", thread: "2" },   // Тема «Отчёты бара»
     gooddeeds: { id: "-1003983614806", thread: "40" },  // Тема «Добрые дела»
+    general:   { id: "-1003983614806", thread: "1" },   // Тема General
   },
 
   /* Имя бота (для формирования ссылок) */
@@ -385,7 +386,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
     <div class="card" id="cl-list"></div>
     <div class="banner banner-green" id="cl-ok" style="display:none">
       <span class="banner-ico">🎉</span>
-      <span>Все пункты выполнены! Поставь реакцию на сообщение бота.</span>
+      <span id="cl-ok-text">Все пункты выполнены! Отправляем в чат...</span>
     </div>
   </div>
 </div>
@@ -581,6 +582,7 @@ const GD = [
 const today = new Date().getDay();
 let clMode = 'open';
 let clDone = { open:{}, close:{} };
+let clSent = { open:false, close:false };
 let gdDay    = today;
 let gdDone   = {};
 let gdPhotos = {};   // хранит FileList по дням
@@ -619,6 +621,9 @@ function clSwitch(m) {
   clMode = m;
   document.getElementById('so').classList.toggle('active', m==='open');
   document.getElementById('sc').classList.toggle('active', m==='close');
+  // Сбрасываем сообщение при переключении
+  const lbl = document.getElementById('cl-ok-text');
+  if (lbl) lbl.textContent = 'Все пункты выполнены! Отправляем в чат...';
   renderCL();
 }
 
@@ -658,7 +663,30 @@ function renderCL() {
 
 function toggleCL(i) {
   clDone[clMode][i] = !clDone[clMode][i];
-  haptic(); renderCL();
+  haptic();
+  renderCL();
+
+  // Проверяем завершение чек-листа
+  const list = clMode === 'open' ? CL_OPEN : CL_CLOSE;
+  const done = Object.values(clDone[clMode]).filter(Boolean).length;
+  if (done === list.length && list.length > 0 && !clSent[clMode]) {
+    sendChecklistDone();
+  }
+}
+
+async function sendChecklistDone() {
+  const mode = clMode;
+  clSent[mode] = true;
+  const chat = CONFIG.chats.general;
+  const msg = mode === 'open'
+    ? `Чек лист открытия выполнен!\nОт: ${getUserName()}`
+    : `Чек лист закрытия выполнен!\nОт: ${getUserName()}`;
+
+  const okSent = await sendToTelegram(chat.id, chat.thread, msg);
+  const lbl = document.getElementById('cl-ok-text');
+  if (lbl) lbl.textContent = okSent
+    ? 'Все пункты выполнены! Отправил в чат.'
+    : 'Все пункты выполнены! (Ошибка отправки в чат)';
 }
 
 /* ══════════════════════════════════════════════════════════════
