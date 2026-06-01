@@ -677,12 +677,26 @@ function toggleCL(i) {
 async function sendChecklistDone() {
   const mode = clMode;
   clSent[mode] = true;
-  const chat = CONFIG.chats.general;
   const msg = mode === 'open'
     ? `Чек лист открытия выполнен!\nОт: ${getUserName()}`
     : `Чек лист закрытия выполнен!\nОт: ${getUserName()}`;
 
-  const okSent = await sendToTelegram(chat.id, chat.thread, msg);
+  // Отправляем напрямую без thread_id — пойдёт в General топик
+  const url = `https://api.telegram.org/bot${CONFIG.token}/sendMessage`;
+  const body = { chat_id: '-1003983614806', text: msg };
+
+  let okSent = false;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    okSent = data.ok;
+    if (!data.ok) console.error('Checklist send error:', data);
+  } catch(e) { console.error(e); }
+
   const lbl = document.getElementById('cl-ok-text');
   if (lbl) lbl.textContent = okSent
     ? 'Все пункты выполнены! Отправил в чат.'
