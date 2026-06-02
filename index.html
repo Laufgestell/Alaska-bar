@@ -25,7 +25,17 @@ const CONFIG = {
     freshes:     "https://docs.google.com/spreadsheets/d/1XKFCLNvvrW5DX7r0YVwF-7Sd72aF6B_wIl5WuZu-Hh4/edit?usp=drivesdk",  // Проработка фрешей
     invoiceChat: "https://t.me/c/2711189697/160",  // Чат Накладные бар
     writeoffChat:"https://t.me/c/2711189697/170",  // Чат Списания бар
-    tips:        "https://docs.google.com/spreadsheets/d/11Ywvyx2-SU_CkPHhNS9GsWMQPzFWy2CoEZdBNUc9NVA/edit?usp=drivesdk", // Чаевые
+
+    // Команда
+    chatGeneral:    "https://t.me/c/3601196777/5",   // General Alaska
+    chatPool:       "https://t.me/c/3291601274",     // Pool
+    chatCoins:      "https://t.me/c/5026070721",     // Монеты
+
+    // Lucky Group
+    chatLuckyBar:       "https://t.me/c/1795210746", // Lucky Bar Group
+    chatLuckyGroup:     "https://t.me/c/1591107576", // Lucky Group
+    chatLuckyCommunity: "https://t.me/c/1855108560", // Lucky Community
+    tips:        "https://docs.google.com/spreadsheets/d/1KHYudqy5b_B3QhPERg0_ZuIgtYxLw3VoFaQvE3XQou4/edit?usp=drivesdk", // Чаевые
     invoices:    "https://t.me/c/2711189697/160", // Чат Накладные бар
     writeoffs:   "https://t.me/c/2711189697/170", // Чат Списания бар
     freshes:     "https://docs.google.com/spreadsheets/d/1XKFCLNvvrW5DX7r0YVwF-7Sd72aF6B_wIl5WuZu-Hh4/edit?usp=drivesdk", // Проработка фрешей
@@ -369,7 +379,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
       </div>
       <div class="qlink" onclick="goTo('docs')">
         <span class="qlink-icon">📚</span>
-        <div class="qlink-body"><div class="qlink-title">Документы</div><div class="qlink-sub">Тех карты · Бланки · График</div></div>
+        <div class="qlink-body"><div class="qlink-title">Важное</div><div class="qlink-sub">Документы · Чаты · Ссылки</div></div>
         <span class="qlink-arr">›</span>
       </div>
     </div>
@@ -407,7 +417,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
 
     <div class="sec-label">Где заказать</div>
     <div class="card order-card">
-      <div class="qlink" onclick="openChat('https://t.me/c/5041180758/1')">
+      <div class="qlink" onclick="openChat('https://t.me/c/5041180758')">
         <span class="qlink-icon">🍓</span>
         <div class="qlink-body">
           <div class="qlink-title">Фрукторина</div>
@@ -415,7 +425,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
         </div>
         <span class="qlink-arr">›</span>
       </div>
-      <div class="qlink" onclick="openChat('https://t.me/c/3680204349/1')">
+      <div class="qlink" onclick="openChat('https://t.me/c/3680204349')">
         <span class="qlink-icon">🥬</span>
         <div class="qlink-body">
           <div class="qlink-title">Рынок</div>
@@ -423,7 +433,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
         </div>
         <span class="qlink-arr">›</span>
       </div>
-      <div class="qlink" onclick="openChat('https://t.me/c/2842449654/1')">
+      <div class="qlink" onclick="openChat('https://t.me/c/2842449654')">
         <span class="qlink-icon">🧊</span>
         <div class="qlink-body">
           <div class="qlink-title">Лёд</div>
@@ -513,14 +523,16 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
   <div class="page" id="page-docs">
 <div class="page-inner">
     <div class="hero" style="padding:15px 17px">
-      <div class="hero-eyebrow">Библиотека</div>
-      <div class="hero-title" style="font-size:24px">Документы</div>
-      <div class="hero-sub" style="margin-top:4px">Все рабочие материалы Alaska</div>
+      <div class="hero-eyebrow">Всё важное</div>
+      <div class="hero-title" style="font-size:24px">Важное</div>
+      <div class="hero-sub" style="margin-top:4px">Документы, чаты и рабочие ссылки</div>
     </div>
     <div class="sec-label">Бар</div>
     <div class="card" id="docs-bar"></div>
-    <div class="sec-label" id="docs-team-label" style="display:none">Команда</div>
-    <div class="card" id="docs-team" style="display:none"></div>
+    <div class="sec-label">Команда</div>
+    <div class="card" id="docs-team"></div>
+    <div class="sec-label">Lucky Group</div>
+    <div class="card" id="docs-lucky"></div>
   </div>
 </div>
 
@@ -533,7 +545,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
   <button class="nav-btn"        onclick="goTo('order')">    <span class="ni">📦</span>Заказы</button>
   <button class="nav-btn"        onclick="goTo('report')">   <span class="ni">📝</span>Отчёт</button>
   <button class="nav-btn"        onclick="goTo('gooddeeds')"><span class="ni">📅</span>Добрые дела</button>
-  <button class="nav-btn"        onclick="goTo('docs')">     <span class="ni">📚</span>Документы</button>
+  <button class="nav-btn"        onclick="goTo('docs')">     <span class="ni">📚</span>Важное</button>
 </nav>
 
 <script>
@@ -987,26 +999,29 @@ async function sendGdReport() {
 ══════════════════════════════════════════════════════════════ */
 function buildDocs() {
   const bar = [
-    { ico:'📖', title:'Тех карты',         sub:'Рецепты и технологические карты', href: CONFIG.links.techCards },
-    { ico:'🍸', title:'Классика',          sub:'Классические коктейли',            href: CONFIG.links.classic },
-    { ico:'🍊', title:'Проработка фрешей', sub:'Таблица проработки',               href: CONFIG.links.freshes },
-    { ico:'✏️', title:'Бланк списания',    sub:'Форма для списания продуктов',    href: CONFIG.links.writeOff },
-    { ico:'💰', title:'Чаевые',            sub:'Таблица учёта чаевых',             href: CONFIG.links.tips },
-    { ico:'📊', title:'График',            sub:'Расписание смен',                  href: CONFIG.links.schedule },
-    { ico:'📋', title:'Обучение',          sub:'Материалы для обучения',           href: CONFIG.links.training },
-    { ico:'📥', title:'Чат Накладные бар', sub:'Открыть чат накладных',            href: CONFIG.links.invoices,  isChat: true },
-    { ico:'📤', title:'Чат Списания бар',  sub:'Открыть чат списаний',             href: CONFIG.links.writeoffs, isChat: true },
+    { ico:'📖', title:'Тех карты',           sub:'Рецепты и технологические карты', href: CONFIG.links.techCards },
+    { ico:'🍸', title:'Классика',            sub:'Классические коктейли',            href: CONFIG.links.classic },
+    { ico:'🍊', title:'Проработка фрешей',   sub:'Список фрешей и пюре',             href: CONFIG.links.freshes },
+    { ico:'✏️', title:'Бланк списания',      sub:'Форма для списания продуктов',     href: CONFIG.links.writeOff },
+    { ico:'💰', title:'Чаевые',              sub:'Таблица учёта чаевых',             href: CONFIG.links.tips },
+    { ico:'📊', title:'График',              sub:'Расписание смен',                  href: CONFIG.links.schedule },
+    { ico:'📋', title:'Обучение',            sub:'Материалы для обучения',           href: CONFIG.links.training },
+    { ico:'📥', title:'Чат Накладные бар',   sub:'Прислать накладную',               tg: 'https://t.me/c/2711189697/160' },
+    { ico:'📤', title:'Чат Списания бар',    sub:'Прислать списание',                tg: 'https://t.me/c/2711189697/170' },
   ];
-  const row = ({ico,title,sub,href,msg,isChat}) => {
-    if (msg) {
-      return `<div class="qlink" onclick="alert('${msg}')">
-        <span class="qlink-icon">${ico}</span>
-        <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
-        <span class="qlink-arr">›</span>
-      </div>`;
-    }
-    if (isChat) {
-      return `<div class="qlink" onclick="openChat('${href}')">
+  const team = [
+    { ico:'🏝', title:'General Alaska',  sub:'Общий чат Alaska',           tg: 'https://t.me/c/3601196777/5' },
+    { ico:'🏊', title:'Pool',            sub:'Чат Pool',                   tg: 'https://t.me/c/3291601274' },
+    { ico:'🪙', title:'Монеты',          sub:'Чат Монеты',                 tg: 'https://t.me/c/5026070721' },
+  ];
+  const lucky = [
+    { ico:'🍸', title:'Lucky Bar Group',   sub:'Чат барменов компании',         tg: 'https://t.me/c/1795210746' },
+    { ico:'🍀', title:'Lucky Group',       sub:'Основной чат компании',         tg: 'https://t.me/c/1591107576' },
+    { ico:'💬', title:'Lucky Community',   sub:'Сообщество компании',           tg: 'https://t.me/c/1855108560' },
+  ];
+  const row = ({ico,title,sub,href,tg}) => {
+    if (tg) {
+      return `<div class="qlink" onclick="openChat('${tg}')">
         <span class="qlink-icon">${ico}</span>
         <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
         <span class="qlink-arr">›</span>
@@ -1018,12 +1033,9 @@ function buildDocs() {
        <span class="qlink-arr">↗</span>
      </a>`;
   };
-  document.getElementById('docs-bar').innerHTML  = bar.map(row).join('');
-  // Раздел "Команда" больше не нужен
-  const teamEl = document.getElementById('docs-team');
-  if (teamEl) teamEl.style.display = 'none';
-  const teamLabel = document.getElementById('docs-team-label');
-  if (teamLabel) teamLabel.style.display = 'none';
+  document.getElementById('docs-bar').innerHTML   = bar.map(row).join('');
+  document.getElementById('docs-team').innerHTML  = team.map(row).join('');
+  document.getElementById('docs-lucky').innerHTML = lucky.map(row).join('');
 }
 
 /* ══════════════════════════════════════════════════════════════
