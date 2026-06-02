@@ -19,10 +19,16 @@ const CONFIG = {
     classic:     "https://docs.google.com/spreadsheets/d/1GcFLK13TDk_f4euTXEh3lhDAIcvZKzLLavJ634xbSaA/edit?usp=drivesdk",  // Классика
     writeOff:    "https://docs.google.com/spreadsheets/d/1heKzaGoMpmKqyAE1UjACCJjNIzZIMHVBcCvN2zZXmAw/edit?usp=drivesdk",  // Бланк списания
     schedule:    "https://docs.google.com/spreadsheets/d/1_1l7JXCs6HXfRNBVqmkhk2tFFsSz5YMA8y7PwETZnAQ/edit?usp=drivesdk",  // График
-    training:    "https://docs.google.com/ВСТАВЬ_ССЫЛКУ",  // Обучение
+    training:    "https://drive.google.com/drive/folders/1Pm_gzbfHXB8_LGwMP7pDdiZ_AVz4gck3",  // Обучение
     chats:       "https://t.me/ВСТАВЬ_ССЫЛКУ",             // Чаты
     calculator:  "https://docs.google.com/ВСТАВЬ_ССЫЛКУ",  // Калькулятор
+    freshes:     "https://docs.google.com/spreadsheets/d/1XKFCLNvvrW5DX7r0YVwF-7Sd72aF6B_wIl5WuZu-Hh4/edit?usp=drivesdk",  // Проработка фрешей
+    invoiceChat: "https://t.me/c/2711189697/160",  // Чат Накладные бар
+    writeoffChat:"https://t.me/c/2711189697/170",  // Чат Списания бар
     tips:        "https://docs.google.com/spreadsheets/d/11Ywvyx2-SU_CkPHhNS9GsWMQPzFWy2CoEZdBNUc9NVA/edit?usp=drivesdk", // Чаевые
+    invoices:    "https://t.me/c/2711189697/160", // Чат Накладные бар
+    writeoffs:   "https://t.me/c/2711189697/170", // Чат Списания бар
+    freshes:     "https://docs.google.com/spreadsheets/d/1XKFCLNvvrW5DX7r0YVwF-7Sd72aF6B_wIl5WuZu-Hh4/edit?usp=drivesdk", // Проработка фрешей
   },
 
   /* Chat ID чатов (узнать через @userinfobot) */
@@ -401,7 +407,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
 
     <div class="sec-label">Где заказать</div>
     <div class="card order-card">
-      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-5041180758')">
+      <div class="qlink" onclick="openChat('https://t.me/c/5041180758/1')">
         <span class="qlink-icon">🍓</span>
         <div class="qlink-body">
           <div class="qlink-title">Фрукторина</div>
@@ -409,7 +415,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
         </div>
         <span class="qlink-arr">›</span>
       </div>
-      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-1003680204349')">
+      <div class="qlink" onclick="openChat('https://t.me/c/3680204349/1')">
         <span class="qlink-icon">🥬</span>
         <div class="qlink-body">
           <div class="qlink-title">Рынок</div>
@@ -417,7 +423,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
         </div>
         <span class="qlink-arr">›</span>
       </div>
-      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-1002842449654')">
+      <div class="qlink" onclick="openChat('https://t.me/c/2842449654/1')">
         <span class="qlink-icon">🧊</span>
         <div class="qlink-body">
           <div class="qlink-title">Лёд</div>
@@ -513,8 +519,8 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
     </div>
     <div class="sec-label">Бар</div>
     <div class="card" id="docs-bar"></div>
-    <div class="sec-label">Команда</div>
-    <div class="card" id="docs-team"></div>
+    <div class="sec-label" id="docs-team-label" style="display:none">Команда</div>
+    <div class="card" id="docs-team" style="display:none"></div>
   </div>
 </div>
 
@@ -981,19 +987,26 @@ async function sendGdReport() {
 ══════════════════════════════════════════════════════════════ */
 function buildDocs() {
   const bar = [
-    { ico:'📖', title:'Тех карты',      sub:'Рецепты и технологические карты', href: CONFIG.links.techCards },
-    { ico:'🍸', title:'Классика',       sub:'Классические коктейли',            href: CONFIG.links.classic },
-    { ico:'✏️', title:'Бланк списания', sub:'Форма для списания продуктов',    href: CONFIG.links.writeOff },
-    { ico:'💰', title:'Чаевые',         sub:'Таблица учёта чаевых',             href: CONFIG.links.tips },
+    { ico:'📖', title:'Тех карты',         sub:'Рецепты и технологические карты', href: CONFIG.links.techCards },
+    { ico:'🍸', title:'Классика',          sub:'Классические коктейли',            href: CONFIG.links.classic },
+    { ico:'🍊', title:'Проработка фрешей', sub:'Таблица проработки',               href: CONFIG.links.freshes },
+    { ico:'✏️', title:'Бланк списания',    sub:'Форма для списания продуктов',    href: CONFIG.links.writeOff },
+    { ico:'💰', title:'Чаевые',            sub:'Таблица учёта чаевых',             href: CONFIG.links.tips },
+    { ico:'📊', title:'График',            sub:'Расписание смен',                  href: CONFIG.links.schedule },
+    { ico:'📋', title:'Обучение',          sub:'Материалы для обучения',           href: CONFIG.links.training },
+    { ico:'📥', title:'Чат Накладные бар', sub:'Открыть чат накладных',            href: CONFIG.links.invoices,  isChat: true },
+    { ico:'📤', title:'Чат Списания бар',  sub:'Открыть чат списаний',             href: CONFIG.links.writeoffs, isChat: true },
   ];
-  const team = [
-    { ico:'📊', title:'График',    sub:'Расписание смен',          href: CONFIG.links.schedule },
-    { ico:'📋', title:'Обучение',  sub:'Материалы для обучения',    href: null, msg: 'В разработке, скоро здесь будет ссылка на диск!' },
-    { ico:'💬', title:'Чаты',      sub:'Все рабочие чаты команды',  href: null, msg: 'В разработке!' },
-  ];
-  const row = ({ico,title,sub,href,msg}) => {
+  const row = ({ico,title,sub,href,msg,isChat}) => {
     if (msg) {
       return `<div class="qlink" onclick="alert('${msg}')">
+        <span class="qlink-icon">${ico}</span>
+        <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
+        <span class="qlink-arr">›</span>
+      </div>`;
+    }
+    if (isChat) {
+      return `<div class="qlink" onclick="openChat('${href}')">
         <span class="qlink-icon">${ico}</span>
         <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
         <span class="qlink-arr">›</span>
@@ -1006,7 +1019,11 @@ function buildDocs() {
      </a>`;
   };
   document.getElementById('docs-bar').innerHTML  = bar.map(row).join('');
-  document.getElementById('docs-team').innerHTML = team.map(row).join('');
+  // Раздел "Команда" больше не нужен
+  const teamEl = document.getElementById('docs-team');
+  if (teamEl) teamEl.style.display = 'none';
+  const teamLabel = document.getElementById('docs-team-label');
+  if (teamLabel) teamLabel.style.display = 'none';
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1116,7 +1133,10 @@ function haptic() {
 
 function openChat(url) {
   haptic();
-  if (window.Telegram?.WebApp?.openLink) {
+  // Используем openTelegramLink для t.me ссылок — откроет в самом Telegram
+  if (window.Telegram?.WebApp?.openTelegramLink) {
+    Telegram.WebApp.openTelegramLink(url);
+  } else if (window.Telegram?.WebApp?.openLink) {
     Telegram.WebApp.openLink(url);
   } else {
     window.open(url, '_blank');
