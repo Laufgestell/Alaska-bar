@@ -394,30 +394,36 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
   <!-- ORDERS -->
   <div class="page" id="page-order">
 <div class="page-inner">
-    <div class="card">
-      <div class="card-head">
-        <div class="card-icon">📦</div>
-        <div><div class="card-title">Заказ продуктов</div><div class="card-sub">Отправится в чат «Заказы»</div></div>
-      </div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Список — каждый продукт с новой строки</label>
-          <textarea class="form-ctrl" id="txP" style="min-height:140px" placeholder="Лимоны — 5 кг&#10;Клубника — 500 гр&#10;Персик — 2 кг&#10;Мята — 100 гр&#10;Морковь — 10 кг"></textarea>
-        </div>
-        <button class="btn btn-gold" id="btnP" onclick="sendOrder('products')">Отправить заказ продуктов</button>
-      </div>
+    <div class="banner banner-gold">
+      <span class="banner-ico">🛒</span>
+      <span>Выбери где заказать. Нажми — откроется нужный чат.</span>
     </div>
-    <div class="card">
-      <div class="card-head">
-        <div class="card-icon">🧊</div>
-        <div><div class="card-title">Заказ льда</div><div class="card-sub">Отправится в чат «Лёд»</div></div>
-      </div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Тип и количество льда</label>
-          <textarea class="form-ctrl" id="txI" style="min-height:160px" placeholder="Куб — 53х53х53 — «вес»&#10;Стик — 45х40х110 — «вес»&#10;Стик #2 — 35х35х125 — «вес»&#10;Глыба — 40х40х70 — «вес»&#10;Кусок — «вес»&#10;Краш — «вес»"></textarea>
+
+    <div class="sec-label">Где заказать</div>
+    <div class="card order-card">
+      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-5041180758')">
+        <span class="qlink-icon">🍓</span>
+        <div class="qlink-body">
+          <div class="qlink-title">Фрукторина</div>
+          <div class="qlink-sub">Заказ продуктов</div>
         </div>
-        <button class="btn btn-gold" id="btnI" onclick="sendOrder('ice')">Отправить заказ льда</button>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-1003680204349')">
+        <span class="qlink-icon">🥬</span>
+        <div class="qlink-body">
+          <div class="qlink-title">Рынок</div>
+          <div class="qlink-sub">Заказ продуктов</div>
+        </div>
+        <span class="qlink-arr">›</span>
+      </div>
+      <div class="qlink" onclick="openChat('https://web.telegram.org/a/#-1002842449654')">
+        <span class="qlink-icon">🧊</span>
+        <div class="qlink-body">
+          <div class="qlink-title">Лёд</div>
+          <div class="qlink-sub">Заказ льда</div>
+        </div>
+        <span class="qlink-arr">›</span>
       </div>
     </div>
   </div>
@@ -681,9 +687,11 @@ async function sendChecklistDone() {
     ? `Чек лист открытия выполнен!\nОт: ${getUserName()}`
     : `Чек лист закрытия выполнен!\nОт: ${getUserName()}`;
 
-  // Отправляем напрямую без thread_id — пойдёт в General топик
   const url = `https://api.telegram.org/bot${CONFIG.token}/sendMessage`;
   const body = { chat_id: '-1003983614806', text: msg };
+
+  // ОТЛАДКА: показываем что именно отправляем
+  alert('Отправляю:\n' + JSON.stringify(body, null, 2));
 
   let okSent = false;
   try {
@@ -694,8 +702,14 @@ async function sendChecklistDone() {
     });
     const data = await res.json();
     okSent = data.ok;
-    if (!data.ok) console.error('Checklist send error:', data);
-  } catch(e) { console.error(e); }
+
+    // ОТЛАДКА: показываем что вернул Telegram
+    if (!data.ok) {
+      alert('Ответ Telegram:\n' + JSON.stringify(data, null, 2));
+    }
+  } catch(e) {
+    alert('Сетевая ошибка: ' + e.message);
+  }
 
   const lbl = document.getElementById('cl-ok-text');
   if (lbl) lbl.textContent = okSent
@@ -974,15 +988,23 @@ function buildDocs() {
   ];
   const team = [
     { ico:'📊', title:'График',    sub:'Расписание смен',          href: CONFIG.links.schedule },
-    { ico:'📋', title:'Обучение',  sub:'Материалы для обучения',    href: CONFIG.links.training },
-    { ico:'💬', title:'Чаты',      sub:'Все рабочие чаты команды',  href: CONFIG.links.chats },
+    { ico:'📋', title:'Обучение',  sub:'Материалы для обучения',    href: null, msg: 'В разработке, скоро здесь будет ссылка на диск!' },
+    { ico:'💬', title:'Чаты',      sub:'Все рабочие чаты команды',  href: null, msg: 'В разработке!' },
   ];
-  const row = ({ico,title,sub,href}) =>
-    `<a class="qlink" href="${href}" target="_blank">
+  const row = ({ico,title,sub,href,msg}) => {
+    if (msg) {
+      return `<div class="qlink" onclick="alert('${msg}')">
+        <span class="qlink-icon">${ico}</span>
+        <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
+        <span class="qlink-arr">›</span>
+      </div>`;
+    }
+    return `<a class="qlink" href="${href}" target="_blank">
        <span class="qlink-icon">${ico}</span>
        <div class="qlink-body"><div class="qlink-title">${title}</div><div class="qlink-sub">${sub}</div></div>
        <span class="qlink-arr">↗</span>
      </a>`;
+  };
   document.getElementById('docs-bar').innerHTML  = bar.map(row).join('');
   document.getElementById('docs-team').innerHTML = team.map(row).join('');
 }
@@ -1090,6 +1112,15 @@ function getUserName() {
 function haptic() {
   if (window.Telegram?.WebApp?.HapticFeedback)
     Telegram.WebApp.HapticFeedback.impactOccurred('light');
+}
+
+function openChat(url) {
+  haptic();
+  if (window.Telegram?.WebApp?.openLink) {
+    Telegram.WebApp.openLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
