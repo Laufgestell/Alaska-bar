@@ -362,11 +362,6 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
         <div class="qlink-body"><div class="qlink-title">Чек-лист</div><div class="qlink-sub">Открытие · Закрытие</div></div>
         <span class="qlink-arr">›</span>
       </div>
-      <div class="qlink" onclick="goTo('order')">
-        <span class="qlink-icon">📦</span>
-        <div class="qlink-body"><div class="qlink-title">Заказы</div><div class="qlink-sub">Продукты · Лёд</div></div>
-        <span class="qlink-arr">›</span>
-      </div>
       <div class="qlink" onclick="goTo('report')">
         <span class="qlink-icon">📝</span>
         <div class="qlink-body"><div class="qlink-title">Отчёт по смене</div><div class="qlink-sub">Текст · Фото</div></div>
@@ -408,42 +403,7 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
 </div>
 
   <!-- ORDERS -->
-  <div class="page" id="page-order">
-<div class="page-inner">
-    <div class="banner banner-gold">
-      <span class="banner-ico">🛒</span>
-      <span>Выбери где заказать. Нажми — откроется нужный чат.</span>
-    </div>
 
-    <div class="sec-label">Где заказать</div>
-    <div class="card order-card">
-      <div class="qlink" onclick="openChat('https://t.me/c/5041180758/1')">
-        <span class="qlink-icon">🍓</span>
-        <div class="qlink-body">
-          <div class="qlink-title">Фрукторина</div>
-          <div class="qlink-sub">Заказ продуктов</div>
-        </div>
-        <span class="qlink-arr">›</span>
-      </div>
-      <div class="qlink" onclick="openChat('https://t.me/c/3680204349/1')">
-        <span class="qlink-icon">🥬</span>
-        <div class="qlink-body">
-          <div class="qlink-title">Рынок</div>
-          <div class="qlink-sub">Заказ продуктов</div>
-        </div>
-        <span class="qlink-arr">›</span>
-      </div>
-      <div class="qlink" onclick="openChat('https://t.me/c/2842449654/1')">
-        <span class="qlink-icon">🧊</span>
-        <div class="qlink-body">
-          <div class="qlink-title">Лёд</div>
-          <div class="qlink-sub">Заказ льда</div>
-        </div>
-        <span class="qlink-arr">›</span>
-      </div>
-    </div>
-  </div>
-</div>
 
   <!-- REPORT -->
   <div class="page" id="page-report">
@@ -542,7 +502,6 @@ textarea.form-ctrl{ min-height:90px; resize:none; line-height:1.6; }
 <nav class="nav">
   <button class="nav-btn active" onclick="goTo('home')">     <span class="ni">🏠</span>Главная</button>
   <button class="nav-btn"        onclick="goTo('checklist')"><span class="ni">✅</span>Чек-лист</button>
-  <button class="nav-btn"        onclick="goTo('order')">    <span class="ni">📦</span>Заказы</button>
   <button class="nav-btn"        onclick="goTo('report')">   <span class="ni">📝</span>Отчёт</button>
   <button class="nav-btn"        onclick="goTo('gooddeeds')"><span class="ni">📅</span>Добрые дела</button>
   <button class="nav-btn"        onclick="goTo('docs')">     <span class="ni">📚</span>Важное</button>
@@ -616,7 +575,7 @@ let gdNotes  = {};   // доп. заметки по дням
 /* ══════════════════════════════════════════════════════════════
    NAV
 ══════════════════════════════════════════════════════════════ */
-const PAGES = ['home','checklist','order','report','gooddeeds','docs'];
+const PAGES = ['home','checklist','report','gooddeeds','docs'];
 
 function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1012,7 +971,6 @@ function buildDocs() {
   const team = [
     { ico:'🏝', title:'General Alaska',  sub:'Общий чат Alaska',           tg: 'https://t.me/c/3601196777/5' },
     { ico:'🏊', title:'Pool',            sub:'Чат Pool',                   tg: 'https://t.me/c/3291601274/1' },
-    { ico:'🪙', title:'Монеты',          sub:'Чат Монеты',                 tg: 'https://t.me/c/5026070721/1' },
   ];
   const lucky = [
     { ico:'🍸', title:'Lucky Bar Group',   sub:'Чат барменов компании',         tg: 'https://t.me/c/1795210746/1' },
